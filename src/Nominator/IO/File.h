@@ -21,6 +21,20 @@ Copyright 2024 tacosontitan and contributors
 /* Represents a file on the filesystem. */
 struct File
 {
+    /*
+     * Creates a new file.
+     * @param directory The path to the file, excluding the file's name and extension.
+     * @param name The name of the file, excluding the extension.
+     * @param extension The extension of the file, excluding the dot.
+     */
+    File(std::string directory, std::string name, std::string extension)
+    {
+        this->Directory = directory;
+        this->Name = name;
+        this->Extension = extension;
+    }
+    
+    
     /* The name of the file, without the extension. */
     std::string Name;
 

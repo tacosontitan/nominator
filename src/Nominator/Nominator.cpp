@@ -18,7 +18,8 @@ Copyright 2024 tacosontitan and contributors
 
 int main(int argc, char* argv[])
 {
-    auto logger = new Logger();
-    logger->log(LogLevel::Information, "Nominator", "Hello, world!");
+    auto loggerCategory = "Nominator";
+    auto logger = new Logger(loggerCategory);
+    logger->log(LogLevel::Information, "Hello, world!");
     return 0;
 }

@@ -28,13 +28,25 @@ class Logger
 
 public:
     /*
+     * Creates a new logger.
+     * @param category The category of the logger.
+     */
+    Logger(std::string category)
+    {
+        this->category = category;
+    }
+    
+    /*
      * Logs a message with the specified level.
      * @param level The level of the message.
      * @param message The message to log.
      */
-    void log(LogLevel level, std::string category, std::string message);
+    void log(LogLevel level, std::string message);
 
 private:
+    /* The category of the logger. */
+    std::string category;
+    
     /*
      * Gets the string representation of the specified level.
      * @param level The level to get the string representation of.

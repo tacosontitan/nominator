@@ -21,7 +21,7 @@ Copyright 2024 tacosontitan and contributors
 #include <format>
 
 
-void Logger::log(LogLevel level, std::string category, std::string message)
+void Logger::log(LogLevel level, std::string message)
 {
     auto timestamp = getCurrentTimestamp();
     auto logLevel = getLevelAsString(level);

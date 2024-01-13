@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2024 tacosontitan and contributors
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,29 @@ Copyright 2024 tacosontitan and contributors
    limitations under the License.
 */
 
-#include "Logging/Logger.h"
+#ifndef LOGLEVEL_H
+#define LOGLEVEL_H
 
-int main(int argc, char* argv[])
+/* Represents the level of a log message. */
+enum class LogLevel
 {
-    auto logger = new Logger();
-    logger->log(LogLevel::Information, "Nominator", "Hello, world!");
-    return 0;
-}
+    /* Represents a trace message. */
+    Trace = 0,
+
+    /* Represents a debug message. */
+    Debug = 1,
+
+    /* Represents an informational message. */
+    Information = 2,
+
+    /* Represents a warning that has occurred. */
+    Warning = 3,
+
+    /* Represents an error that has occurred. */
+    Error = 4,
+
+    /* Represents a fatal error that has occurred. */
+    Critical = 5
+};
+
+#endif // LOGLEVEL_H

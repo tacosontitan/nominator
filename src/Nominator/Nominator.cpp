@@ -14,12 +14,21 @@ Copyright 2024 tacosontitan and contributors
    limitations under the License.
 */
 
+#include "IO/DirectoryWorker.h"
 #include "Logging/Logger.h"
 
 int main(int argc, char* argv[])
 {
     auto loggerCategory = "Nominator";
     auto logger = new Logger(loggerCategory);
-    logger->log(LogLevel::Information, "Hello, world!");
+    logger->log(LogLevel::Debug, "Creating initial worker.");
+
+    auto workingDirectory = "change-me";
+    auto workerLoggerCategory = "DirectoryWorker (main)";
+    auto workerLogger = new Logger(workerLoggerCategory);
+    auto worker = new DirectoryWorker(workerLogger, workingDirectory);
+    worker->start();
+
+    logger->log(LogLevel::Information, "Work completed successfully.");
     return 0;
 }

@@ -18,45 +18,31 @@ Copyright 2024 tacosontitan and contributors
 #include <future>
 #include <filesystem>
 
-#include "File.h"
-
 namespace fs = std::filesystem;
 
-std::future<void> DirectoryWorker::start()
+void DirectoryWorker::start()
 {
-    auto future = std::async(std::launch::async, [this]()
+    logger->log(LogLevel::Debug, "Identifying children.");
+    auto children = getChildren();
+
+    logger->log(LogLevel::Trace, "Creating workers for children.");
+    for (const auto& child : children)
     {
-        logger->log(LogLevel::Debug, "Identifying children.");
-        auto children = getChildren();
+        auto workerLoggerCategory = "DirectoryWorker (" + getDirectoryName(child) + ")";
+        auto workerLogger = new Logger(workerLoggerCategory);
+        auto worker = new DirectoryWorker(workerLogger, child);
+        worker->start();
+    }
 
-        logger->log(LogLevel::Trace, "Creating workers for children.");
-        std::vector<std::future<void>> futures;
-        for (const auto& child : children)
-        {
-            auto workerLoggerCategory = "DirectoryWorker (" + getDirectoryName() + ")";
-            auto workerLogger = new Logger(workerLoggerCategory);
-            auto worker = new DirectoryWorker(workerLogger, child);
-            auto workerFuture = worker->start();
-            futures.push_back(std::move(workerFuture));
-        }
-
-        logger->log(LogLevel::Trace, "Renaming files.");
-        auto workload = renameFiles();
-        workload.wait();
-
-        logger->log(LogLevel::Trace, "Waiting for workers to finish.");
-        for (const auto& future : futures)
-            future.wait();
-
-        logger->log(LogLevel::Information, "Work completed successfully.");
-    });
-
-    return future;
+    logger->log(LogLevel::Trace, "Renaming files.");
+    renameFiles();
+    
+    logger->log(LogLevel::Information, "Work completed successfully.");
 }
 
-std::string DirectoryWorker::getDirectoryName() const
+std::string DirectoryWorker::getDirectoryName(std::string path)
 {
-    return directory.substr(directory.find_last_of("/\\") + 1);
+    return path.substr(path.find_last_of("/\\") + 1);
 }
 
 std::vector<std::string> DirectoryWorker::getChildren() const
@@ -88,41 +74,52 @@ std::vector<std::string> DirectoryWorker::getChildren() const
     return subdirectories;
 }
 
-std::future<void> DirectoryWorker::renameFiles()
+void DirectoryWorker::renameFiles()
 {
-    auto future = std::async(std::launch::async, [this]()
+    fs::path path(directory);
+    if (!exists(path))
     {
-        fs::path path(directory);
-        if (!exists(path))
-        {
-            logger->log(LogLevel::Error, "Directory does not exist.");
+        logger->log(LogLevel::Error, "Directory does not exist.");
+        return;
+    }
+
+    if (!is_directory(path))
+    {
+        logger->log(LogLevel::Error, "Directory path is not associated with a directory.");
+        return;
+    }
+
+    auto fileCount = 1;
+    for (const auto& entry : fs::directory_iterator(path))
+        renameFile(entry, fileCount);
+
+    logger->log(LogLevel::Information, "Renamed " + std::to_string(fileCount - 1) + " files.");
+}
+
+void DirectoryWorker::renameFile(const std::filesystem::directory_entry& entry, int& fileCount)
+{
+    try
+    {
+        if (is_directory(entry.path()))
             return;
-        }
-
-        if (!is_directory(path))
+        
+        auto fileDirectory = entry.path().parent_path().string();
+        auto fileName = entry.path().filename().string();
+        auto fileExtension = entry.path().extension().string();
+        std::string newFileName;
+        std::string newFilePath;
+        
+        do
         {
-            logger->log(LogLevel::Error, "Directory path is not associated with a directory.");
-            return;
-        }
-
-        auto fileCount = 1;
-        for (const auto& entry : fs::directory_iterator(path))
-        {
-            if (is_directory(entry.path()))
-                continue;
-
-            auto filePath = entry.path().string();
-            auto fileName = entry.path().filename().string();
-            auto fileExtension = entry.path().extension().string();
-            auto file = new File(filePath, fileName, fileExtension);
-            auto newFileName = getDirectoryName() + "-" + std::to_string(fileCount++);
-            auto renameSuccessful = file->rename(newFileName).get();
-            if (!renameSuccessful)
-                logger->log(LogLevel::Error, "Failed to rename file " + fileName + ".");
-        }
-
-        logger->log(LogLevel::Information, "Renamed " + std::to_string(fileCount - 1) + " files.");
-    });
-
-    return future;
+            newFileName = getDirectoryName(directory) + "-" + std::to_string(fileCount++);
+            newFilePath = fileDirectory + "\\" + newFileName + fileExtension;
+        } while (fs::exists(newFilePath));
+        
+        rename(entry.path(), newFilePath);
+        logger->log(LogLevel::Trace, "Renamed file " + fileName + " to " + newFileName + ".");
+    } catch (const std::exception& e)
+    {
+        logger->log(LogLevel::Error, "Failed to rename file.");
+        logger->log(LogLevel::Error, e.what());
+    }
 }

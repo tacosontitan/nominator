@@ -15,7 +15,7 @@ Copyright 2024 tacosontitan and contributors
 */
 
 #pragma once
-#include <future>
+#include <filesystem>
 #include "../Logging/Logger.h"
 
 /* Represents a worker that works in a directory. */
@@ -37,7 +37,7 @@ public:
      * Starts the directory worker.
      * @return A future that will be set when the directory worker has finished.
      */
-    std::future<void> start();
+    void start();
 
 protected:
     /* The logger to use. */
@@ -51,7 +51,7 @@ private:
      * Gets the name of the directory.
      * @return The name of the directory.
      */
-    std::string getDirectoryName() const;
+    static std::string getDirectoryName(std::string path);
 
     /*
      * Gets the children of the directory.
@@ -63,5 +63,12 @@ private:
      * Renames the files in the directory.
      * @return A future that will be set when the files have been renamed.
      */
-    std::future<void> renameFiles();
+    void renameFiles();
+
+    /*
+     * Renames a file in the directory.
+     * @param path The path of the file to rename.
+     * @return A future that will be set when the file has been renamed.
+     */
+    void renameFile(const std::filesystem::directory_entry& entry, int& index);
 };

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nominator", "Nominator\Nominator.vcxproj", "{1F37C27D-9FC4-4FD1-98DD-F1ABAFDD7383}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nominator", "src\Nominator\Nominator.vcxproj", "{1F37C27D-9FC4-4FD1-98DD-F1ABAFDD7383}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -156,11 +156,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IO\DirectoryWorker.cpp" />
+    <ClCompile Include="IO\File.cpp" />
     <ClCompile Include="Logging\Logger.cpp" />
     <ClCompile Include="Logging\LogLevel.h" />
     <ClCompile Include="Nominator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IO\DirectoryWorker.h" />
+    <ClInclude Include="IO\File.h" />
     <ClInclude Include="Logging\Logger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
